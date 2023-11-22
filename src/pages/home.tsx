@@ -7,6 +7,21 @@ import { setEvaluate, setMessage } from '../server'
 import Markdown from 'react-markdown'
 import { v4 as uuidv4 } from 'uuid';
 
+import rehypeRaw from 'rehype-raw';
+import rehypeReact from 'rehype-react';
+
+const LinkRenderer = ({ href, children }) => (
+    <a href={href} target="_blank" rel="noopener noreferrer">
+        {children}
+    </a>
+);
+
+const renderers = {
+    // 将 a 标签的解析映射到 LinkRenderer 组件
+    link: ({ href, children }) => <LinkRenderer href={href}>{children}</LinkRenderer>,
+};
+
+
 const Home: React.FC = () => {
     const navigate = useNavigate()
     const userName = localStorage.getItem('userName')
@@ -23,13 +38,7 @@ const Home: React.FC = () => {
     // 用于操作聊天列表元素的引用
     const chatListRef = useRef(null)
 
-    // 声明一个包含Markdown格式字符串的变量
-    const markdown = `
-### 123   
-## 123  
-- 123  
-- 456
-`
+
 
     const addMessage = async () => {
         if (messageType !== '' && currentMessage.trim() !== '') {
@@ -43,9 +52,60 @@ const Home: React.FC = () => {
                     setcurrentMessage('')
                     setItems((old) => {
                         console.log('old', old);
+                        const parsedData = res.data.data.map((item: any) => JSON.parse(item));
+                        console.log('parsedData:', parsedData);
+
+                        let markdownString = '';
+
+
+                        parsedData.forEach((item: any) => {
+
+                            // 标题加连接
+                            markdownString += `### <a href="${item.detailUrl}" target="_blank">${item.title}</a>\n\n`;
+
+                            // 问题描述
+                            markdownString += `-  问题描述：${item.questions}\n\n`;
+
+                            // 如果问题补充存在，就显示
+                            if (item.questionsAdditionalInfo) {
+                                markdownString += `-  问题补充描述：${item.questionsAdditionalInfo}\n\n`;
+                            }
+
+                            // 处理问题图片
+                            if (item.questionsPicture && item.questionsPicture.length > 0) {
+
+                                let questionsPicture = 1;
+                                item.questionsPicture.forEach((picUrl: any) => {
+
+                                    // 添加链接前缀，创建Markdown格式图片链接
+                                    const imageUrl = `https://www.ad.siemens.com.cn${picUrl}`;
+                                    markdownString += `- 问题图片${questionsPicture}: <a href="${imageUrl}" target="_blank">${imageUrl}</a>\n\n`;
+                                    questionsPicture++;
+                                });
+                            }
+                            // 回答
+                            markdownString += `- 回答：${item.answer}\n\n`;
+                            // 处理回答图片
+                            // 处理回答图片
+                            if (item.answerPicture && item.answerPicture.length > 0) {
+                                let answerPicture = 1;
+
+                                item.answerPicture.forEach((picUrl: any) => {
+                                    // 添加链接前缀，创建 Markdown 格式图片链接
+                                    const imageUrl = `https://www.ad.siemens.com.cn${picUrl}`;
+                                    markdownString += `- 回答图片${answerPicture}: <a href="${imageUrl}" target="_blank">${imageUrl}</a>\n\n`;
+                                    answerPicture++;
+                                });
+                            }
+                            // 如果有其他字段需要在 Markdown 中展示，可以在这里继续追加
+                        });
+
+
                         const oldmew = old.slice(0, old.length - 1)
-                        const newValue = [...oldmew, { type: 0, value: markdown }]
+                        const newValue = [...oldmew, { type: 0, value: markdownString }]
+
                         return newValue
+
                     })
                 }, 1000)
             }
@@ -133,7 +193,10 @@ const Home: React.FC = () => {
                         items.map((item: { type: number, value: string }, index: number) => {
                             return <div className="item" style={{ background: item.type ? '' : 'rgb(247, 247, 248)' }} key={index}>
                                 <div className="solvemeg">
-                                    {item.type ? avatar : avatarAi} <span>{item.value === '-1' ? <LoadingOutlined /> : !item.type ? <Markdown>{item.value}</Markdown> : item.value}</span>
+                                    {item.type ? avatar : avatarAi}
+                                    <span>
+                                        {item.value === '-1' ? <LoadingOutlined /> : !item.type ? <Markdown rehypePlugins={[rehypeRaw, rehypeReact]} components={renderers}>{item.value}</Markdown> : item.value}
+                                    </span>
                                 </div>
                                 <div className="dianzhan">
                                     <div className="top">
