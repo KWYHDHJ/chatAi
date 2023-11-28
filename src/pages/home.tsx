@@ -64,7 +64,9 @@ const Home: React.FC = () => {
                             markdownString += `### <a href="${item.detailUrl}" target="_blank">${item.title}</a>\n\n`;
 
                             // 问题描述
-                            markdownString += `-  问题描述：${item.questions}\n\n`;
+                            if (item.questionsAdditionalInfo) {
+                                markdownString += `-  问题描述：${item.questions}\n\n`;
+                            }
 
                             // 如果问题补充存在，就显示
                             if (item.questionsAdditionalInfo) {
@@ -84,8 +86,10 @@ const Home: React.FC = () => {
                                 });
                             }
                             // 回答
-                            markdownString += `- 回答：${item.answer}\n\n`;
-                            // 处理回答图片
+                            if (item.answer && item.answer.length > 0) {
+                                markdownString += `- 回答：${item.answer}\n\n`;
+                            }
+
                             // 处理回答图片
                             if (item.answerPicture && item.answerPicture.length > 0) {
                                 let answerPicture = 1;
@@ -96,6 +100,11 @@ const Home: React.FC = () => {
                                     markdownString += `- 回答图片${answerPicture}: <a href="${imageUrl}" target="_blank">${imageUrl}</a>\n\n`;
                                     answerPicture++;
                                 });
+                            }
+
+                            // 文档详情描述
+                            if (item.introduce) {
+                                markdownString += `-  文档详情：${item.introduce}\n\n`;
                             }
                             // 如果有其他字段需要在 Markdown 中展示，可以在这里继续追加
                         });
