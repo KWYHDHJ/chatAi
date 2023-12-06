@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -9,8 +9,9 @@ export default defineConfig({
       // 正则表达式写法
       // '/api': 'http://43x818e468.zicp.fun:5001'
       // '/api': 'https://ems.fenxi-tech.com'
-      "/api": "http://localhost:3100"
-    }
+      // "/api": "http://192.168.21.251:3100",
+      "/api": "http://localhost:3100",
+    },
   },
   plugins: [react()],
-})
+});

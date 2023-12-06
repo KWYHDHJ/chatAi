@@ -1,9 +1,9 @@
-import { useRoutes } from "react-router-dom";
-import config from './config';
+import { RouteObject, useRoutes } from "react-router-dom";
+import config from "./config";
 
 function Config() {
-  const element = useRoutes(config)
-  return element
+  const element = useRoutes(config as RouteObject[]);
+  return element;
 }
 
-export default Config 
+export default Config;

@@ -10,16 +10,22 @@ import { v4 as uuidv4 } from 'uuid';
 import rehypeRaw from 'rehype-raw';
 import rehypeReact from 'rehype-react';
 
-const LinkRenderer = ({ href, children }) => (
+const LinkRenderer = ({ href, children }: { href: string, children: React.ReactNode }) => (
     <a href={href} target="_blank" rel="noopener noreferrer">
         {children}
     </a>
 );
 
 const renderers = {
-    // 将 a 标签的解析映射到 LinkRenderer 组件
-    link: ({ href, children }) => <LinkRenderer href={href}>{children}</LinkRenderer>,
+    link: ({ href, children }: { href?: string, children: React.ReactNode }) => {
+        if (href) {
+            return <LinkRenderer href={href}>{children}</LinkRenderer>;
+        } else {
+            return null; // 处理 href 为 undefined 的情况
+        }
+    },
 };
+
 
 
 const Home: React.FC = () => {
@@ -42,16 +48,19 @@ const Home: React.FC = () => {
 
     const addMessage = async () => {
         if (messageType !== '' && currentMessage.trim() !== '') {
+
+
             setItems([...items, { type: 1, value: currentMessage }, { type: 0, value: '-1' }])
             const res = await setMessage({
                 type: messageType,
                 value: currentMessage,
+
             })
             if (res.data.code === 200) {
                 setTimeout(() => {
                     setcurrentMessage('')
                     setItems((old) => {
-                        console.log('old', old);
+
                         const parsedData = res.data.data.map((item: any) => JSON.parse(item));
                         console.log('parsedData:', parsedData);
 
@@ -122,9 +131,13 @@ const Home: React.FC = () => {
     }
 
 
-    const handleChange = (value: string, option: { value: string, label: string, msg: string }) => {
-        setItems([{ type: 0, value: option.msg }])
-        setmessageType(value)
+    const handleChange = (value: string, option: { value: string, label: string, msg: string } | { value: string, label: string, msg: string }[]) => {
+        if (Array.isArray(option)) {
+            // 如果是数组形式的参数，可以在这里处理
+        } else {
+            setItems([{ type: 0, value: option.msg }])
+            setmessageType(value)
+        }
     };
     useEffect(() => {
         if (userName === null) {
@@ -175,6 +188,7 @@ const Home: React.FC = () => {
 
 
     return (
+
         <div className="home">
             <div className='left'>2 / 5</div>
             <div className='right' ref={chatListRef}>
@@ -204,7 +218,10 @@ const Home: React.FC = () => {
                                 <div className="solvemeg">
                                     {item.type ? avatar : avatarAi}
                                     <span>
-                                        {item.value === '-1' ? <LoadingOutlined /> : !item.type ? <Markdown rehypePlugins={[rehypeRaw, rehypeReact]} components={renderers}>{item.value}</Markdown> : item.value}
+                                        {item.value === '-1' ? <LoadingOutlined /> : !item.type ? (
+                                            item.value && <Markdown rehypePlugins={[rehypeRaw,
+                                                rehypeReact]} components={renderers as Partial<Components>}>{item.value}</Markdown>
+                                        ) : item.value}
                                     </span>
                                 </div>
                                 <div className="dianzhan">
