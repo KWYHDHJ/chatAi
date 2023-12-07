@@ -73,13 +73,15 @@ const Home: React.FC = () => {
                             markdownString += `### <a href="${item.detailUrl}" target="_blank">${item.title}</a>\n\n`;
 
                             // 问题描述
-                            if (item.questionsAdditionalInfo) {
-                                markdownString += `-  问题描述：${item.questions}\n\n`;
+                            if (item.questions) {
+                                markdownString += `###  问题描述：\n`
+                                markdownString += `${item.questions}\n\n`;
                             }
 
                             // 如果问题补充存在，就显示
                             if (item.questionsAdditionalInfo) {
-                                markdownString += `-  问题补充描述：${item.questionsAdditionalInfo}\n\n`;
+                                markdownString += `###  问题补充描述：\n`
+                                markdownString += `${item.questionsAdditionalInfo}\n\n`;
                             }
 
                             // 处理问题图片
@@ -90,13 +92,15 @@ const Home: React.FC = () => {
 
                                     // 添加链接前缀，创建Markdown格式图片链接
                                     const imageUrl = `https://www.ad.siemens.com.cn${picUrl}`;
+
                                     markdownString += `- 问题图片${questionsPicture}: <a href="${imageUrl}" target="_blank">${imageUrl}</a>\n\n`;
                                     questionsPicture++;
                                 });
                             }
                             // 回答
                             if (item.answer && item.answer.length > 0) {
-                                markdownString += `- 回答：${item.answer}\n\n`;
+                                markdownString += `###  回答：\n`
+                                markdownString += `${item.answer}\n\n`;
                             }
 
                             // 处理回答图片
@@ -113,7 +117,8 @@ const Home: React.FC = () => {
 
                             // 文档详情描述
                             if (item.introduce) {
-                                markdownString += `-  文档详情：${item.introduce}\n\n`;
+                                markdownString += `###  文档详情：\n`
+                                markdownString += `${item.introduce}\n\n`;
                             }
                             // 如果有其他字段需要在 Markdown 中展示，可以在这里继续追加
                         });
