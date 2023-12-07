@@ -4,7 +4,7 @@ import { Button, Input, message, Space, Avatar, Select, } from 'antd'
 import { SetStateAction, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { setEvaluate, setMessage } from '../server'
-import Markdown from 'react-markdown'
+import Markdown, { Components } from 'react-markdown'
 import { v4 as uuidv4 } from 'uuid';
 
 import rehypeRaw from 'rehype-raw';
@@ -70,37 +70,40 @@ const Home: React.FC = () => {
                         parsedData.forEach((item: any) => {
 
                             // 标题加连接
-                            markdownString += `### <a href="${item.detailUrl}" target="_blank">${item.title}</a>\n\n`;
+                            markdownString += `以下是为您推荐的，与您问题相关性最高的回答: \n`
+                            markdownString += `### 标题: <a href="${item.detailUrl}" target="_blank">${item.title}</a>\n\n`;
 
                             // 问题描述
                             if (item.questions) {
-                                markdownString += `###  问题描述：\n`
-                                markdownString += `${item.questions}\n\n`;
+                                markdownString += `> ###  问题描述：\n`
+                                markdownString += `>${item.questions}\n\n`;
                             }
 
                             // 如果问题补充存在，就显示
                             if (item.questionsAdditionalInfo) {
-                                markdownString += `###  问题补充描述：\n`
-                                markdownString += `${item.questionsAdditionalInfo}\n\n`;
+                                markdownString += `> ###  问题补充描述：\n`
+                                markdownString += `> ${item.questionsAdditionalInfo}\n\n`;
                             }
 
                             // 处理问题图片
                             if (item.questionsPicture && item.questionsPicture.length > 0) {
 
                                 let questionsPicture = 1;
-                                item.questionsPicture.forEach((picUrl: any) => {
 
+                                item.questionsPicture.forEach((picUrl: any) => {
                                     // 添加链接前缀，创建Markdown格式图片链接
                                     const imageUrl = `https://www.ad.siemens.com.cn${picUrl}`;
 
-                                    markdownString += `- 问题图片${questionsPicture}: <a href="${imageUrl}" target="_blank">${imageUrl}</a>\n\n`;
+                                    // 生成Markdown格式的图片
+                                    markdownString += `>  <a href="${imageUrl}" target="_blank">问题图片${questionsPicture}:</a>\n\n`
+                                    markdownString += `> <img src="${imageUrl}" alt="问题图片${questionsPicture}" width="400">\n\n`;
                                     questionsPicture++;
                                 });
                             }
                             // 回答
                             if (item.answer && item.answer.length > 0) {
-                                markdownString += `###  回答：\n`
-                                markdownString += `${item.answer}\n\n`;
+                                markdownString += `> ###  回答：\n`
+                                markdownString += `>${item.answer}\n\n`;
                             }
 
                             // 处理回答图片
@@ -110,15 +113,20 @@ const Home: React.FC = () => {
                                 item.answerPicture.forEach((picUrl: any) => {
                                     // 添加链接前缀，创建 Markdown 格式图片链接
                                     const imageUrl = `https://www.ad.siemens.com.cn${picUrl}`;
-                                    markdownString += `- 回答图片${answerPicture}: <a href="${imageUrl}" target="_blank">${imageUrl}</a>\n\n`;
+
+
+                                    // 生成Markdown格式的图片
+                                    markdownString += `>  <a href="${imageUrl}" target="_blank">回答图片${answerPicture}:</a>\n\n`
+                                    markdownString += `> <img src="${imageUrl}" alt="回答图片${answerPicture}" width="400">\n\n`;
                                     answerPicture++;
+
                                 });
                             }
 
                             // 文档详情描述
                             if (item.introduce) {
-                                markdownString += `###  文档详情：\n`
-                                markdownString += `${item.introduce}\n\n`;
+                                markdownString += `> ###  文档详情：\n`
+                                markdownString += `> ${item.introduce}\n\n`;
                             }
                             // 如果有其他字段需要在 Markdown 中展示，可以在这里继续追加
                         });
