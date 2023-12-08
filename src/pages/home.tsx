@@ -49,20 +49,22 @@ const Home: React.FC = () => {
     const addMessage = async () => {
         if (messageType !== '' && currentMessage.trim() !== '') {
 
+            // 判断是第一次提问还是追问
+            const isFollowUp = items.length > 1
 
             setItems([...items, { type: 1, value: currentMessage }, { type: 0, value: '-1' }])
+
             const res = await setMessage({
+                isFollowUp: isFollowUp,
                 type: messageType,
                 value: currentMessage,
-
             })
             if (res.data.code === 200) {
                 setTimeout(() => {
                     setcurrentMessage('')
                     setItems((old) => {
 
-                        const parsedData = res.data.data.map((item: any) => JSON.parse(item));
-                        console.log('parsedData:', parsedData);
+                        const parsedData = res.data.data
 
                         let markdownString = '';
 
@@ -70,8 +72,12 @@ const Home: React.FC = () => {
                         parsedData.forEach((item: any) => {
 
                             // 标题加连接
-                            markdownString += `以下是为您推荐的，与您问题相关性最高的回答: \n`
-                            markdownString += `### 标题: <a href="${item.detailUrl}" target="_blank">${item.title}</a>\n\n`;
+
+                            // 标题
+                            if (item.title) {
+                                markdownString += `以下是为您推荐的，与您问题相关性最高的回答: \n`
+                                markdownString += `### 标题: <a href="${item.detailUrl}" target="_blank">${item.title}</a>\n\n`;
+                            }
 
                             // 问题描述
                             if (item.questions) {
@@ -128,6 +134,11 @@ const Home: React.FC = () => {
                                 markdownString += `> ###  文档详情：\n`
                                 markdownString += `> ${item.introduce}\n\n`;
                             }
+
+                            // gpt回复
+                            if (item.gptresult) {
+                                markdownString += `${item.gptresult}\n\n`;
+                            }
                             // 如果有其他字段需要在 Markdown 中展示，可以在这里继续追加
                         });
 
@@ -136,7 +147,6 @@ const Home: React.FC = () => {
                         const newValue = [...oldmew, { type: 0, value: markdownString }]
 
                         return newValue
-
                     })
                 }, 1000)
             }

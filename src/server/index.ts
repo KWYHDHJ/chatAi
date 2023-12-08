@@ -1,6 +1,7 @@
 import request from "./request";
 
 export const setMessage = (data: {
+  isFollowUp: boolean;
   type: string;
   value: string;
   // words: string[];
