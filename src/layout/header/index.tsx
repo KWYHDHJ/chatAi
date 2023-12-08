@@ -19,6 +19,7 @@ const Header = () => {
   return (
     <>
       <div className="head">
+        <div style={{ width: "100%", textAlign: "center", fontSize: "20px", color: "#0070c0", fontWeight: "bold" }}>西门子工控AI AGENT</div>
         <Tooltip title={outLogin} color="#fff" mouseLeaveDelay={0.5} >
           <Avatar style={{ backgroundColor: '#0070c0' }} icon={<UserOutlined />} />
         </Tooltip>

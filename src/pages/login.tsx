@@ -12,7 +12,7 @@ const Login: React.FC = () => {
         const { username, password } = values
         if (username === 'admin' && password === 'admin123') {
             message.success('登录成功！');
-            localStorage.setItem('userName','admin')
+            localStorage.setItem('userName', 'admin')
             navigate('/home')
         } else {
             message.error('账号或密码错误！');
@@ -28,6 +28,7 @@ const Login: React.FC = () => {
         <div className="login">
             <div className="content">
                 <img src="https://ems.fenxi-tech.com/image/logo.png" alt="" />
+                <div style={{ width: "100%", textAlign: "center", fontSize: "20px", color: "#0070c0", fontWeight: "bold" }}>西门子工控AI AGENT</div>
                 <Form
                     labelCol={{ span: 3 }}
                     wrapperCol={{ span: 20 }}
