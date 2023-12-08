@@ -10,7 +10,7 @@ export const setMessage = (data: {
     method: "POST",
     url: "/users/setMessage",
     data,
-    timeout: 10000, // 设置请求超时时间为10秒
+    timeout: 100000, // 设置请求超时时间为10秒
   });
 
 export const setEvaluate = (data: {

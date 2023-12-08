@@ -207,7 +207,7 @@ const Home: React.FC = () => {
     }, [currentMessage, messageType])
 
     const avatar = <Avatar style={{ backgroundColor: '#0070c0', }} icon={<UserOutlined />} />
-    const avatarAi = <Avatar style={{ backgroundColor: '#19c37d', }} icon={<RedditOutlined />} />
+    const avatarAi = <Avatar style={{ backgroundColor: '#19c37d', width: "35px", height: "35px" }} icon={<RedditOutlined />} />
 
 
     return (
