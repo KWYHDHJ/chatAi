@@ -32,6 +32,7 @@ const Home: React.FC = () => {
     const navigate = useNavigate()
     const userName = localStorage.getItem('userName')
     const [currentMessage, setcurrentMessage] = useState('')
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [items, setItems] = useState<{ type: number, value: string | any }[]>([])
     const [messageType, setmessageType] = useState('')
@@ -45,10 +46,14 @@ const Home: React.FC = () => {
     const chatListRef = useRef(null)
 
 
-
     const addMessage = async () => {
+        console.log('messageType: ', messageType);
+        console.log('currentMessage: ', currentMessage);
         if (messageType !== '' && currentMessage.trim() !== '') {
 
+
+
+            console.log("开始请求");
             // 判断是第一次提问还是追问
             const isFollowUp = items.length > 1
 
@@ -61,7 +66,10 @@ const Home: React.FC = () => {
             })
             if (res.data.code === 200) {
                 setTimeout(() => {
-                    setcurrentMessage('')
+                    if (items.length > 4) {
+                        setcurrentMessage('')
+                    }
+                    // setcurrentMessage('')
                     setItems((old) => {
 
                         const parsedData = res.data.data
@@ -70,74 +78,74 @@ const Home: React.FC = () => {
 
 
                         parsedData.forEach((item: any) => {
+                            if (item != null) {
+                                // 标题
+                                if (item.title && item.title.length > 0) {
+                                    markdownString += `以下是为您推荐的，与您问题相关性最高的回答: \n`
+                                    markdownString += `### 标题: <a href="${item.detailUrl}" target="_blank">${item.title}</a>\n\n`;
+                                }
 
-                            // 标题加连接
+                                // 问题描述
+                                if (item.questions && item.questions.length > 0) {
+                                    markdownString += `> ###  问题描述：\n`
+                                    markdownString += `>${item.questions}\n\n`;
+                                }
 
-                            // 标题
-                            if (item.title) {
-                                markdownString += `以下是为您推荐的，与您问题相关性最高的回答: \n`
-                                markdownString += `### 标题: <a href="${item.detailUrl}" target="_blank">${item.title}</a>\n\n`;
-                            }
+                                // 如果问题补充存在，就显示
+                                if (item.questionsAdditionalInfo && item.questionsAdditionalInfo.length > 0) {
+                                    markdownString += `> ###  问题补充描述：\n`
+                                    markdownString += `> ${item.questionsAdditionalInfo}\n\n`;
+                                }
 
-                            // 问题描述
-                            if (item.questions) {
-                                markdownString += `> ###  问题描述：\n`
-                                markdownString += `>${item.questions}\n\n`;
-                            }
+                                // 处理问题图片
+                                if (item.questionsPicture && item.questionsPicture.length > 0) {
 
-                            // 如果问题补充存在，就显示
-                            if (item.questionsAdditionalInfo) {
-                                markdownString += `> ###  问题补充描述：\n`
-                                markdownString += `> ${item.questionsAdditionalInfo}\n\n`;
-                            }
+                                    let questionsPicture = 1;
 
-                            // 处理问题图片
-                            if (item.questionsPicture && item.questionsPicture.length > 0) {
+                                    item.questionsPicture.forEach((picUrl: any) => {
+                                        // 添加链接前缀，创建Markdown格式图片链接
+                                        const imageUrl = `https://www.ad.siemens.com.cn${picUrl}`;
 
-                                let questionsPicture = 1;
+                                        // 生成Markdown格式的图片
+                                        markdownString += `>  <a href="${imageUrl}" target="_blank">问题图片${questionsPicture}:</a>\n\n`
+                                        markdownString += `> <img src="${imageUrl}" alt="问题图片${questionsPicture}" width="400">\n\n`;
+                                        questionsPicture++;
+                                    });
+                                }
+                                // 回答
+                                if (item.answer && item.answer.length > 0) {
+                                    markdownString += `> ###  回答：\n`
+                                    markdownString += `>${item.answer}\n\n`;
+                                }
 
-                                item.questionsPicture.forEach((picUrl: any) => {
-                                    // 添加链接前缀，创建Markdown格式图片链接
-                                    const imageUrl = `https://www.ad.siemens.com.cn${picUrl}`;
+                                // 处理回答图片
+                                if (item.answerPicture && item.answerPicture.length > 0) {
+                                    let answerPicture = 1;
 
-                                    // 生成Markdown格式的图片
-                                    markdownString += `>  <a href="${imageUrl}" target="_blank">问题图片${questionsPicture}:</a>\n\n`
-                                    markdownString += `> <img src="${imageUrl}" alt="问题图片${questionsPicture}" width="400">\n\n`;
-                                    questionsPicture++;
-                                });
-                            }
-                            // 回答
-                            if (item.answer && item.answer.length > 0) {
-                                markdownString += `> ###  回答：\n`
-                                markdownString += `>${item.answer}\n\n`;
-                            }
-
-                            // 处理回答图片
-                            if (item.answerPicture && item.answerPicture.length > 0) {
-                                let answerPicture = 1;
-
-                                item.answerPicture.forEach((picUrl: any) => {
-                                    // 添加链接前缀，创建 Markdown 格式图片链接
-                                    const imageUrl = `https://www.ad.siemens.com.cn${picUrl}`;
+                                    item.answerPicture.forEach((picUrl: any) => {
+                                        // 添加链接前缀，创建 Markdown 格式图片链接
+                                        const imageUrl = `https://www.ad.siemens.com.cn${picUrl}`;
 
 
-                                    // 生成Markdown格式的图片
-                                    markdownString += `>  <a href="${imageUrl}" target="_blank">回答图片${answerPicture}:</a>\n\n`
-                                    markdownString += `> <img src="${imageUrl}" alt="回答图片${answerPicture}" width="400">\n\n`;
-                                    answerPicture++;
+                                        // 生成Markdown格式的图片
+                                        markdownString += `>  <a href="${imageUrl}" target="_blank">回答图片${answerPicture}:</a>\n\n`
+                                        markdownString += `> <img src="${imageUrl}" alt="回答图片${answerPicture}" width="400">\n\n`;
+                                        answerPicture++;
 
-                                });
-                            }
+                                    });
+                                }
 
-                            // 文档详情描述
-                            if (item.introduce) {
-                                markdownString += `> ###  文档详情：\n`
-                                markdownString += `> ${item.introduce}\n\n`;
-                            }
+                                // 文档详情描述
+                                if (item.introduce && item.introduce.length > 0) {
+                                    markdownString += `> ###  文档详情：\n`
+                                    markdownString += `> ${item.introduce}\n\n`;
+                                }
 
-                            // gpt回复
-                            if (item.gptresult) {
-                                markdownString += `${item.gptresult}\n\n`;
+                                // gpt回复
+                                if (item.gptresult && item.gptresult.length > 0) {
+                                    markdownString += `${item.gptresult}\n\n`;
+                                }
+
                             }
                             // 如果有其他字段需要在 Markdown 中展示，可以在这里继续追加
                         });
@@ -173,11 +181,19 @@ const Home: React.FC = () => {
 
 
     const setEvaluateHandler = async (behavior: string, index: number) => {
+        if (items.length === 3 && behavior === 'down') {
+
+            setcurrentMessage(items[1].value);
+        }
         const res = await setEvaluate({
             chatId: uuidv4(),
             type: behavior,
             problemList: items.slice(1, index + 1),
         })
+        if (items.length === 3 && behavior === 'down') {
+            addMessage(); // 这里假设 addMessage 是你想调用的方法
+            setcurrentMessage("")
+        }
         if (res.data.code === 200) {
             message.success('反馈成功！');
         }
