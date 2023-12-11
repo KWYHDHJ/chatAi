@@ -182,6 +182,7 @@ const Home: React.FC = () => {
 
     const setEvaluateHandler = async (behavior: string, index: number) => {
         if (items.length === 3 && behavior === 'down') {
+            console.log('items.length: ', items.length);
 
             setcurrentMessage(items[1].value);
         }
